@@ -77,8 +77,6 @@
 % 
 % 
 
-% NOTE: For the continuous case, make sure to fix the other parameters.
-
 
 
 
