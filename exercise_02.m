@@ -8,8 +8,6 @@
 % simulated, sample of data from imagined participants.
 %
 % We will analyse the data of two samples of participants.
-% Remember: We hypothesized that the patient group would be
-% overestimating the volatility of their environment. 
 % 
 % In this file, we are working with continuous inputs and
 % responses. The types of paradigms you can imagine for this are:
@@ -20,7 +18,6 @@
 % Here, we will be looking for differences in the omega_1 parameter
 % estimates. We will initially fit a two-level continuous
 % HGF.
-
 
 
 
@@ -44,9 +41,14 @@
 %% Ex_2.0.2: 
 %  From here on, use the inputs provided in the file
 %  'data/inputs_continuous_u.csv'.
-%  Estimate and plot the trajectories of the model for the prior
-%  parameters in the default configuration file. Describe what you see.
-%  
+%  Simulate responses using the `tapas_simModel` function and 
+%  the parameter vector below. Visualize the outcome using 
+%  the function `tapas_hgf_plotTraj`.
+
+%      mu0(1) mu0(2) sa0(1) sa0(1)  rho(1) rho(2)
+pars = [2     0      .1      .1     0     0  ...
+%     log(ka)     om(1)  om(2)  log(pi_u)
+       log(1)       2      0        100];
 
 
 
@@ -64,6 +66,7 @@ om1 = [-2 + randn(n/2,1); -10 + randn(n/2,1)];
 
 
 
+
 %#########################################################
 % 2.1. Individual modelling and 2nd level anayses
 %#########################################################
@@ -77,7 +80,7 @@ om1 = [-2 + randn(n/2,1); -10 + randn(n/2,1)];
 %  Fit the binary HGF to each participants responses
 %  separately. Save the model fits into a file with the path
 %  'data/fits_continuous.mat'. Use the `tapas_gaussian_obs` 
-%  response model and the default `tapas_hgf` configuration. 
+%  response model and the provided `config_continuous` configuration file. 
 
 
 
@@ -107,9 +110,15 @@ om1 = [-2 + randn(n/2,1); -10 + randn(n/2,1)];
 
 
 
+
 %% Ex_2.2.2: 
-%  Perform a posterior predictive check. Sample from the estimates
-%  of both groups and compare them to the observed data.
+%  Perform a posterior predictive check. Sample response using the 
+%  previously obtained estimates and compare them 
+%  to the observed data.
+%  - Start with two example subjects from each of the groups 
+%  - Look at the trajectories of those participants, that have
+%  estimates away from most of the others in their group
+%  - What do you find?
 
 
 
@@ -117,47 +126,6 @@ om1 = [-2 + randn(n/2,1); -10 + randn(n/2,1)];
 %% Ex_2.2.3: 
 %  Check identifiability: Plot the average posterior correlation
 %  matrix. 
-
-
-
-
-
-%#########################################################
-% 2.3. Changing the priors
-%#########################################################
-% We saw in the previous section that the model did not fit
-% the data perfectly for one of the groups. 
-%
-% Here we'll try changing the prior.
-
-%% Ex_2.3.1: 
-%  Create your own config file and change the values for
-%  the priors of the following parameters:
-%  - om2:   Fixed
-%  - mu_10: Fixed
-%  - mu_20: Fixed
-
-
-
-
-
-%#########################################################
-% 2.4. Comparison with 3-level model
-%#########################################################
-% Here, we will compare our previous model to a 3-level model.
-
-
-
-%% Ex_2.4.1: 
-%  Create a new config file for a 3-level model and fit
-%  it to the data.
-
-
-
-
-%% Ex_2.4.2: 
-%  Compare the 2- and 3-level models. For this, compute the
-%  difference in LME values summed over the subjects in each group.
 
 
 
