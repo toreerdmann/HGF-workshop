@@ -56,8 +56,8 @@ hold off;
 
 % fit:
 fit = tapas_fitModel(dataset(:, 1), u, ...
-               'tapas_hgf_binary_config', ...
-               'tapas_beta_obs_config');
+               'tapas_hgf_*insert here*_config', ...
+               'tapas_*insert here*_config');
 % plot:
 tapas_hgf_binary_plotTraj(fit)
 
@@ -67,7 +67,7 @@ tapas_hgf_binary_plotTraj(fit)
 % - are there systematic deviations? Are we missing something?
 
 % Look at fit object:
-fit
+
 
 % Where can you find what?
 % - the estimates for the parameters: perceptual and response model
@@ -133,31 +133,15 @@ end
 
 %% Ex_1.2.2:
 % Plot the belief trajectories of the hgf and rw models together:
-plot(results(1).fit.traj.muhat(:,2))
-hold on  
-scatter(1:length(u), u);
-for i=1:6
-    plot(results(i).fit.traj.muhat(:,2))
-end
-plot(results(7).fit.traj.vhat)
-hold off
 
 
 
 %% Ex_1.2.3:
 % Plot the prediction errors of the HGF (level 1 and level 3) and 
 % those of the RW model together:
-subplot(2, 1, 1)
-plot(results(1).fit.traj.da(:,1))
-hold on 
-plot(results(3).fit.traj.da)
-hold off
-subplot(2, 1, 2)
-plot(abs(results(1).fit.traj.da(:,3)))
-hold on
-pe = abs(diff(p))
-plot([0; pe] * .000001)
-hold off
+
+
+
 
 %% Ex_1.2.4:
 % Can you come up with interpretations for each model?
@@ -170,17 +154,17 @@ hold off
 %  #########################################################
 % We now do a posterior predictive check.
 
-% Simulate from each model for an example participant.
-i = 1;
-j = 1;
+%% Ex_1.3.1:
+% Simulate from each model for one example participant.
+% Read the documentation by calling `help tapas_simModel` and insert
+% the right arguments in the function below.
+
 nreps = 10;
-yrep = zeros(length(dataset(:,i)), nreps);
+yrep = zeros(length(dataset(:,1)), nreps);
 for rep=1:nreps
-    s = tapas_simModel(u, ...
-                       results(j).fit.c_prc.model, ...
-                       results(j).fit.p_prc.p, ...
-                       results(j).fit.c_obs.model, ...
-                       results(j).fit.p_obs.p);
+%    s = tapas_simModel(u, ...
+%                        %% insert arguments here
+%                       );
     yrep(:, rep) = s.y;
 end
 
@@ -201,16 +185,13 @@ hold off;
 % Pick a parameter (that was not fixed) and try adjusting it up or down.
 % Can you interpret the meaning through the change in data?
 
-% Pick model 1
-j = 1;
-% Change here:
-parameters = results(j).fit.p_prc.p;
-parameters(14) = parameters(14) + 3;
-sim = tapas_simModel(u, ...
-                   results(j).fit.c_prc.model, ...
-                   parameters, ...
-                   results(j).fit.c_obs.model, ...
-                   results(j).fit.p_obs.p);
+
+% % Change below:
+% parameters = 
+% % Call function with parameters:
+% sim = tapas_simModel(u, ...
+%                      insert arguments here
+%                      );
 
 
 % Compare belief trajectories and responses:
@@ -298,27 +279,3 @@ end
 % - try more or less volatile designs
 
 
-u = rand(100, 1) < .5;
-nsubjects = 10;
-seed = round(rand() * 1000);
-run_simulation(nsubjects, seed)
-
-
-%% Try inputs with implied changes in volatility
-p = [repmat(.9, 50, 1)
-     repmat(.1, 50, 1)
-     repmat(.9, 50, 1)
-     repmat(.1, 15, 1)
-     repmat(.9, 15, 1)
-     repmat(.1, 15, 1)
-     repmat(.9, 15, 1)
-     repmat(.1, 15, 1)
-     repmat(.9, 15, 1)];
-u = p;
-for ii = 1:length(p)
-    u(ii) = rand() < p(ii);
-end
-plot(p)
-nsubjects = 10;
-seed = round(rand() * 1000);
-run_simulation(nsubjects, seed)
