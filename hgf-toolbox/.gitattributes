@@ -1,0 +1,13 @@
+.gitignore               export-ignore
+.gitattributes           export-ignore
+export.sh                export-ignore
+add_tapas_prefix.sh      export-ignore
+tapas_hgfsim.m           export-ignore
+tapas_gridsim*           export-ignore
+tapas_plot_logGaussian.m export-ignore
+tapas_plot_sgmGaussian.m export-ignore
+tapas_grw_gen.m          export-ignore
+tapas_ar1_gen.m          export-ignore
+Manual			 export-ignore
+
+README                   export-subst
