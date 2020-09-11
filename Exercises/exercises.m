@@ -1,5 +1,5 @@
 %#########################################################
-% HGF-toolbox Workshop, CP course Zurich, September 2020
+% HGF-toolbox Workshop, CP course Zurich, 12.09.2020
 % Topic: Modelling data with the HGF
 % Author: Tore Erdmann
 %#########################################################
@@ -10,7 +10,7 @@
 % Load the toolbox and some helper functions
 
 close all; clear variables; clc;
-addpath('../../../repos/hgf-toolbox');
+addpath('../hgf-toolbox');
 addpath('Functions');
 
 
@@ -53,12 +53,12 @@ hold off;
 % a) perceptual model: tapas_hgf_*type of inputs*_config
 % b) response   model: tapas_hgf_*type of responses*_obs_config
 
-% == Edit here ==
+%=== begin: Edit here ===
 % config_prc = tapas_ehgf_***_config;
 % config_rsp = tapas_***_obs_config;
 config_prc = tapas_ehgf_binary_config;
 config_rsp = tapas_beta_obs_config;
-% == Edit here ==
+%=== end: Edit here ===
 
 % fit:
 fit = tapas_fitModel(dataset(:, 1), u, ...
@@ -132,10 +132,12 @@ hold off;
 % Plot the prediction errors of the HGF (level 1 and level 3) and 
 % those of the RW model together:
 
+%=== begin: EDIT HERE ===%
 plot(results(3).fit.traj.da(:,1));
 hold on;
 plot(results(3).fit.traj.da(:,3));
 hold off;
+%=== end: EDIT HERE ===%
 
 %% Describe the qualitative differences between the models.
 
@@ -248,21 +250,23 @@ hold off;
 
 
 %% #########################################################
-%  1.4.0. Fitting multiple subjects and comparing models
+%  4.0. Fitting multiple subjects and comparing models
 %  #########################################################
 %
 % List the names of the config files you created in 'config_files' and
 % use the function 'fit_model' below to fit all models to all subjects.
-
-%% Ex_1.4.1:
-% Read the code for the `fit_model` function and then run the code.
-
+%
+%% Ex_4.1:
+%% Read the code for the `fit_model` function and then run the code.
 results = fit_models(u, dataset, config_files);
 
-% extract omega parameter for plotting
-values = extract_parameter(results(:,1:2), 'p_prc.om');
 
-% Plot boxplot for omega2 and omega3 for config 1
+%% Extract omega parameter for plotting
+%=== begin: EDIT HERE ===%
+values = extract_parameter(results(:,2:3), 'p_prc.om');
+%=== end: EDIT HERE ===%
+
+%% Plot boxplot for omega2 and omega3 for config 1
 figure; 
 subplot(2,1,1)
 boxplot(values(:, 2:3, 1))
@@ -271,7 +275,7 @@ boxplot(values(:, 2:3, 2))
 
 
 
-%% Ex_1.4.2:
+%% Ex_4.2:
 % Read the code for the `extract_parameter` function and then run 
 % the code below.
 
@@ -303,7 +307,7 @@ end
 
 
 %% #########################################################
-%  1.5.0. Try other designs
+%  5.0. Try other designs
 %  #########################################################
 % 
 % We've seen that there are different "kinds" of subjects.
@@ -312,10 +316,16 @@ end
 % Some designs will work better than others: Think about what should 
 % make the differences come out more pronounced in the analysis.
 
-%% Ex_1.5.1:
+%% Ex_5.1:
 % Read the code of the `run_simulation` function.
+%
 % Try it out:
 % - try random design
 % - try more or less volatile designs
+% - try placing the volatile phase in the first half
 
-out = run_simulation(5, 5)
+%=== begin: EDIT HERE ===%
+% out = run_simulation(10, 123);
+%=== end: EDIT HERE ===%
+
+
