@@ -27,12 +27,12 @@ results = fit_models(u, dataset, models);
 
 
 %% For each subject, who is described best by each model?
-nconfigs = length(config_files);
-values = zeros(nsubjects, length(config_files));
+nconfigs = length(models);
+values = zeros(nsubjects, length(models));
 
 % Look at the fit indices.
 for i=1:nsubjects
-    for j=1:length(config_files)
+    for j=1:length(models)
         values(i,j) = results(i, j).fit.optim.LME;
     end
 end

@@ -272,7 +272,7 @@ for j=1:3
     yrep = pp_check(i, j, 10, u, dataset, config_files, results);
 end
 
-% Are there systematic deviations?
+% Which model fits best?
 
 
 
@@ -297,8 +297,6 @@ end
 % - try more or less volatile designs
 % - try placing the volatile phase in the first half
 
-%=== begin: EDIT HERE ===%
-% out = run_simulation(10, 123);
-%=== end: EDIT HERE ===%
+% run_simulation(10, 123);
 
 
