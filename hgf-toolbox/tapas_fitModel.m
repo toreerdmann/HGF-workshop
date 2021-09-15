@@ -358,20 +358,25 @@ if rval ~= 0
     rethrow(err);
 end
 
-% Do an optimization run
-optres = optimrun(nlj, init, opt_idx, opt_algo, r.c_opt);
+try 
+    % Do an optimization run
+    optres = optimrun(nlj, init, opt_idx, opt_algo, r.c_opt);
 
-% Record optimization results
-r.optim.init  = optres.init;
-r.optim.final = optres.final;
-r.optim.H     = optres.H;
-r.optim.Sigma = optres.Sigma;
-r.optim.Corr  = optres.Corr;
-r.optim.negLl = optres.negLl;
-r.optim.negLj = optres.negLj;
-r.optim.LME   = optres.LME;
-r.optim.accu  = optres.accu;
-r.optim.comp  = optres.comp;
+    disp(optres.LME);
+
+    % Record optimization results
+    r.optim.init  = optres.init;
+    r.optim.final = optres.final;
+    r.optim.H     = optres.H;
+    r.optim.Sigma = optres.Sigma;
+    r.optim.Corr  = optres.Corr;
+    r.optim.negLl = optres.negLl;
+    r.optim.negLj = optres.negLj;
+    r.optim.LME   = optres.LME;
+    r.optim.accu  = optres.accu;
+    r.optim.comp  = optres.comp;
+catch
+end
 
 % Do further optimization runs with random initialization
 if isfield(r.c_opt, 'nRandInit') && r.c_opt.nRandInit > 0
@@ -385,30 +390,36 @@ if isfield(r.c_opt, 'nRandInit') && r.c_opt.nRandInit > 0
 
         % Add random values to prior means, drawn from Gaussian with prior sd
         rng('shuffle');
-        init(opt_idx) = init(opt_idx) + randn(1,length(optsds)).*optsds;
+        % before:
+        % init(opt_idx) = init(opt_idx) + randn(1,length(optsds)).*optsds;
+        init(opt_idx) = init(opt_idx) + randn(1,length(optsds)) .* 5;
 
-        % Check whether initialization point is in a region where the objective
-        % function can be evaluated
-        [dummy1, dummy2, rval, err] = nlj(init);
-        if rval ~= 0
-            rethrow(err);
-        end
+        try
+            % Check whether initialization point is in a region where the objective
+            % function can be evaluated
+            [dummy1, dummy2, rval, err] = nlj(init);
+            if rval ~= 0
+                rethrow(err);
+            end
 
-        % Do an optimization run
-        optres = optimrun(nlj, init, opt_idx, opt_algo, r.c_opt);
+            % Do an optimization run
+            optres = optimrun(nlj, init, opt_idx, opt_algo, r.c_opt);
+            disp(optres.LME);
 
-        % Record optimization if the LME is better than the previous record
-        if optres.LME > r.optim.LME
-            r.optim.init  = optres.init;
-            r.optim.final = optres.final;
-            r.optim.H     = optres.H;
-            r.optim.Sigma = optres.Sigma;
-            r.optim.Corr  = optres.Corr;
-            r.optim.negLl = optres.negLl;
-            r.optim.negLj = optres.negLj;
-            r.optim.LME   = optres.LME;
-            r.optim.accu  = optres.accu;
-            r.optim.comp  = optres.comp;
+            % Record optimization if the LME is better than the previous record
+            if optres.LME > r.optim.LME
+                r.optim.init  = optres.init;
+                r.optim.final = optres.final;
+                r.optim.H     = optres.H;
+                r.optim.Sigma = optres.Sigma;
+                r.optim.Corr  = optres.Corr;
+                r.optim.negLl = optres.negLl;
+                r.optim.negLj = optres.negLj;
+                r.optim.LME   = optres.LME;
+                r.optim.accu  = optres.accu;
+                r.optim.comp  = optres.comp;
+            end
+        catch
         end
     end
 end

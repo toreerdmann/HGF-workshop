@@ -1,4 +1,4 @@
-function [traj, infStates] = tapas_ehgf_binary(r, p, varargin)
+function [traj, infStates] = tapas_ehgf_binary_pu(r, p, varargin)
 % Calculates the trajectories of the agent's representations under the HGF
 %
 % This function can be called in two ways:
@@ -23,7 +23,7 @@ function [traj, infStates] = tapas_ehgf_binary(r, p, varargin)
 
 % Transform paramaters back to their native space if needed
 if ~isempty(varargin) && strcmp(varargin{1},'trans')
-    p = tapas_ehgf_binary_transp(r, p);
+    p = tapas_ehgf_binary_pu_transp(r, p);
 end
 
 % Number of levels
@@ -44,6 +44,9 @@ rho  = p(2*l+1:3*l);
 ka   = p(3*l+1:4*l-1);
 om   = p(4*l:5*l-2);
 th   = exp(p(5*l-1));
+al   = p(5*l);
+eta0 = p(5*l+1);
+eta1 = p(5*l+2);
 
 % Add dummy "zeroth" trial
 u = [0; r.u(:,1)];
@@ -114,7 +117,10 @@ for k = 2:1:n
 
         % Updates
         pi(k,1) = Inf;
-        mu(k,1) = u(k);
+        %mu(k,1) = u(k);
+        und1 = exp(-(u(k) -eta1)^2/(2*al));
+        und0 = exp(-(u(k) -eta0)^2/(2*al));
+        mu(k,1) = muhat(k,1) *und1 /(muhat(k,1) *und1 +(1 -muhat(k,1)) *und0);
 
         % Prediction error
         da(k,1) = mu(k,1) -muhat(k,1);
@@ -126,15 +132,9 @@ for k = 2:1:n
         % Precision of prediction
         pihat(k,2) = 1/(1/pi(k-1,2) +exp(ka(2) *mu(k-1,3) +om(2)));
 
-        if isnan(pihat(k,2))
-            %disp(pihat(k,2));
-            error("pihat is nan")
-        end
-
         % Updates
         pi(k,2) = pihat(k,2) +ka(1)^2/pihat(k,1);
         mu(k,2) = muhat(k,2) +ka(1)/pi(k,2) *da(k,1);
-
 
         % Volatility prediction error
         da(k,2) = (1/pi(k,2) +(mu(k,2) -muhat(k,2))^2) *pihat(k,2) -1;
