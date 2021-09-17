@@ -1,4 +1,4 @@
-function [pvec, pstruct] = tapas_beta_obs_transp(r, ptrans)
+function [pvec, pstruct] = tapas_beta_reg_obs_transp(r, ptrans)
 % --------------------------------------------------------------------------------------------------
 % Copyright (C) 2013 Christoph Mathys, TNU, UZH & ETHZ
 %
@@ -10,7 +10,9 @@ function [pvec, pstruct] = tapas_beta_obs_transp(r, ptrans)
 pvec    = NaN(1,length(ptrans));
 pstruct = struct;
 
-pvec(1)      = exp(ptrans(1));         % nupr
-pstruct.nupr = pvec(1);
+pvec(1)      = ptrans(1);         % b0_nu
+pstruct.b0nu = pvec(1);
+pvec(2)      = ptrans(2);         % b1_nu
+pstruct.b1nu = pvec(2);
 
 return;

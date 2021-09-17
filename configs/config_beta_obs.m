@@ -12,7 +12,7 @@ c.model = 'tapas_beta_obs';
 
 % nu'
 c.lognuprmu = log(128);
-c.lognuprsa = 4;
+c.lognuprsa = 3;
 
 % Gather prior settings in vectors
 c.priormus = [

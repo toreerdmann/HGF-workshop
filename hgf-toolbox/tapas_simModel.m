@@ -163,25 +163,36 @@ prc_fun = str2func(r.c_sim.prc_model);
 % Compute perceptual states
 [r.traj, infStates] = prc_fun(r, r.p_prc.p);
 
-if nargin > 4
+if nargin >= 4
     
-    % Remember observation model
-    r.c_sim.obs_model = varargin{1};
+    if isstruct(varargin{1})
+        % If observation model is a struct -> config file
+        c_obs = varargin{1};        
+        r.c_sim.obs_model = c_obs.model;
+        obs_pvec = c_obs.priormus;
+        obs_namep_fun = str2func([r.c_sim.obs_model, '_namep']);
+        r.p_obs   = obs_namep_fun(obs_pvec);
+        r.p_obs.p = obs_pvec;
+        r.c_obs = c_obs;
 
-    % Store observation parameters
-    obs_pvec = varargin{2};
-    obs_namep_fun = str2func([r.c_sim.obs_model, '_namep']);
-    r.p_obs   = obs_namep_fun(obs_pvec);
-    r.p_obs.p = obs_pvec;
-    
-    % Read configuration of observation model
-    try
-        obs_config_fun = str2func([r.c_sim.obs_model, '_config']);
-        r.c_obs = obs_config_fun();
-    catch
-        r.c_obs = [];
-    end    
+    else
+        % Remember observation model
+        r.c_sim.obs_model = varargin{1};
 
+        % Store observation parameters
+        obs_pvec = varargin{2};
+        obs_namep_fun = str2func([r.c_sim.obs_model, '_namep']);
+        r.p_obs   = obs_namep_fun(obs_pvec);
+        r.p_obs.p = obs_pvec;
+
+        % Read configuration of observation model
+        try
+            obs_config_fun = str2func([r.c_sim.obs_model, '_config']);
+            r.c_obs = obs_config_fun();
+        catch
+            r.c_obs = [];
+        end    
+    end
     % Set seed for random number generator
     r.c_sim.seed = NaN;
     if nargin > 5

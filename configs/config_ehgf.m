@@ -1,22 +1,19 @@
-function c = config_hgf_2
-
+function c = config_ehgf
 
 c = struct;
-c.model = 'tapas_ehgf_binary';
+c.model = 'ehgf_binary';
 c.n_levels = 3;
 c.irregular_intervals = false;
 
-c.mu_0mu = [NaN, 0, -4];
+c.mu_0mu = [NaN, 0, 1];
 c.mu_0sa = [NaN, 0, 0];
 c.logsa_0mu = [NaN,   log(0.1), log(1)];
 c.logsa_0sa = [NaN,          0,      0];
-
 
 c.rhomu = [NaN, 0, 0];
 c.rhosa = [NaN, 0, 0];
 c.logkamu = [log(1), log(1)];
 c.logkasa = [     0,      0];
-
 
 c.ommu = [NaN,  -3,   0];
 c.omsa = [NaN,   0,   0];

@@ -1,5 +1,5 @@
 %#########################################################
-% HGF-toolbox Workshop, CP course Zurich, 12.09.2020
+% HGF-toolbox Workshop, CP-course Zurich, 18.09.2021
 % Topic: Modelling data with the HGF
 % Author: Tore Erdmann
 %#########################################################
@@ -12,9 +12,9 @@
 
 close all; clear variables; clc;
 addpath('../hgf-toolbox');
-addpath('Functions');
-
-
+addpath('../Functions');
+addpath('../Models');
+rng(123);
 
 
 %% #########################################################
@@ -28,19 +28,26 @@ addpath('Functions');
 %% Load inputs and dataset
 % Run this code and have a look at the data. u holds the inputs for each
 % trial and dataset holds the responses, with one column per subject.
-u = load('../data/inputs_binary_u.csv');
-p = load('../data/inputs_binary_p.csv');
+% p holds the true underlying contingencies (probability of outcome 1).
+u = load('../data/inputs_u.csv');
+p = load('../data/inputs_p.csv');
 dataset = load('../data/task_responses.csv');
 
 
 %% Look at dataset and design
 % Run this code
+nt = size(dataset, 1);
 figure;
-plot(dataset)
+scatter(1:nt, dataset(:,1) + randn(nt,1) .* .05)
 hold on;
+% scatter(1:nt, dataset(:,2) + randn(nt,1) .* .05)
+plot(1:nt, dataset)
 plot(u, 'p')
 plot(p, 'p')
+plot(mean(dataset,2))
 hold off;
+legend('y_1', 'y_2', 'u', 'p', 'avg y');
+
 
 % What is the type of the responses? What kind of probability distribution
 % could you use to simulate random numbers of the same type?
@@ -52,17 +59,19 @@ hold off;
 %
 % What model can you fit?
 % a) perceptual model: tapas_hgf_*type of inputs*_config
-% b) response   model: tapas_hgf_*type of responses*_obs_config
+% b) response   model: tapas_*type of responses*_obs_config
 
 %=== begin: Edit here ===
-% config_prc = tapas_ehgf_***_config;
-% config_rsp = tapas_***_obs_config;
+config_prc = tapas_ehgf_binary_config;
+config_obs = tapas_beta_obs_config;
+% config_prc = config_hgf_1;
+% config_obs = config_beta_obs;
 %=== end: Edit here ===
 
 % fit:
 fit = tapas_fitModel(dataset(:, 1), u, ...
-               config_prc, ...
-               config_rsp);
+                     config_prc, ...
+                     config_obs, config_optim);
 % plot:
 tapas_hgf_binary_plotTraj(fit)
 
@@ -88,47 +97,61 @@ tapas_hgf_binary_plotTraj(fit)
 
 %% Ex_2.1:
 % Now let's change the model / priors: For this, we need to setup our 
-% own config file: Start by looking up the default config file 
-% 'tapas_ehgf_binary_config.m' and read the comments in it.
-% You can find a copy of this file (with all comments stripped out)
-% in the file 'config_hgf_1.m'. 
+% own config files: Start by looking up the default config file 
+% 'tapas_ehgf_binary_config.m' and copy it to your current folder.
+%
+% Do read the comments in it, they are very useful.
 % 
 % Try the following configurations:
 %
-% 1. Fix all parameters except omega2 and omega3, by setting their prior
-%    variances to 0. 
-%    Save the config file as: `config_hgf_1.m`
-%
-% 2. Create another prior setting named `config_hgf_2.m` with the same
-%    settings, except with mu_0mu(3) set to -4.
+% 1. Try the following configurations: Fix all parameters except omega2 
+%    and omega3, by setting their prior variances to 0.
+%    Save the config file as: `config_ehgf.m`
 %    
-% 3. Try another perceptual model. Start by copying the default config 
+% 2. Add another perceptual model. Start by copying the default config 
 %    file "tapas_rw_binary_config' from the folder of the HGF toolbox and 
 %    name it `config_rw.m`.
+%
+% 3. Add a response model. Start by copying the default config 
+%    file "tapas_beta_obs_config' from the folder of the HGF toolbox and 
+%    name it `config_beta_obs.m`.
+%
+% Note: be careful to also change the name of the functions within the
+% files.
 
 % Once you have the config files, fit each of these models to the data of 
 % a single subject by running the code below:
-config_files = ["config_rw", ...
-                "config_hgf_1", ...
-                "config_hgf_2"];
-            
-% Fit each of the perceptual models, with the observational model fixed.
+configs_prc = {config_rw, config_ehgf};
+configs_obs = {config_beta_obs};
+% Define the set of models by combining perceputal and response models.
+models = make_models(configs_prc, configs_obs);
+                                
+%% Fit each of the models.
 results = struct;
-for i=1:length(config_files)
-    results(i).fit = tapas_fitModel(dataset(:, 1), u, ...
-                                    eval(config_files(i)), ...
-                                    config_beta_obs);
+for i=1:size(models,1)
+    for j=1:size(models,2)
+        results(i,j).fit = tapas_fitModel(dataset(:, 1), u, ...
+                                        models{i,j}.m_prc, ...
+                                        models{i,j}.m_obs, ...
+                                        config_optim);
+    end
 end
+
+%% Look at the parameter estimates
+results(1).fit.p_prc
+results(1).fit.p_obs
+results(2).fit.p_prc
+results(2).fit.p_obs
 
 
 %% Plot the belief trajectories of the hgf and rw models together:
-scatter(1:240, results(2).fit.u);
+figure;
+scatter(1:nt, results(2).fit.u);
 hold on;
-scatter(1:240, results(2).fit.y);
+scatter(1:nt, results(2).fit.y);
 plot(results(1).fit.traj.v(:,1));
 plot(results(2).fit.traj.muhat(:,1));
-plot(results(3).fit.traj.muhat(:,1));
-legend('u', 'y', 'M1_v', 'M2_mu', 'M3_mu');
+legend('u', 'y', 'M1_v', 'M2_\mu');
 hold off;
 
 % Why are we plotting muhat? Try plotting mu.
@@ -143,7 +166,7 @@ hold off;
 % those of the RW model together:
 
 %=== begin: Edit here ===
-% plot(results(3).fit.__);
+% plot(results(1).fit.__);
 % hold on;
 % plot(results(3).fit.__);
 % hold off;
@@ -158,30 +181,29 @@ hold off;
 % Read the documentation by calling `help tapas_simModel` and insert
 % the right arguments in the function below.
 
-nreps = 10;
-yrep = zeros(length(u), nreps, 3);
+nreps = 1;
+nm = numel(models);
+yrep = zeros(length(u), nreps, nm);
 for rep=1:nreps
-    for j=1:3
+    for j=1:nm
         sim = tapas_simModel(u, ...
                             results(j).fit.c_prc.model, ...
                             results(j).fit.p_prc.p, ...
-                            'tapas_beta_obs', ...
+                            results(j).fit.c_obs.model, ...
                             results(j).fit.p_obs.p);
         yrep(:, rep, j) = sim.y;
     end
 end
 
 %% Compare real and simulated observations.
-figure; 
-for j=1:3
-subplot(3, 1, j);
-plot(yrep(:,:,j), 'black')
-hold on;
-plot(dataset(:,1), 'red', 'linewidth', 5)
-hold off;
-end
+% Read the code of the function below and run the code.
+plot_sim_obs(yrep(:,:,:), dataset(:,1));
 
 % Are there systematic differences?
+
+% Which model seems to visually fit best?
+
+% Try repeating the above steps for the data from other participants.
 
 
 %% #########################################################
@@ -193,7 +215,7 @@ end
 % one should do some prior simulations. For these, simulate data
 % from two models only differing in a single parameter.
 %
-% Find out the effect of the om(3) parameter.
+% Find out the effect of some of the parameters.
 %
 % Do the following:
 % 1. Load one of your HGF configurations.
@@ -203,39 +225,68 @@ end
 
 
 % Get the configuration of the perceptual model
-my_config1 = tapas_ehgf_binary_config();
+my_config1 = config_ehgf();
 % Make a copy of the configuration: 
 my_config2 = my_config1;
-% Adjust the value for omega_2: -30
+% - Try comparing low/high values for omega_2.
+% (Remember to fix all other parameters.)
+% - Try the same for omega_3.
+% - Try exploring the response model parameters.
+
+% After setting the values
+
 %=== begin: Edit here ===
-% my_config2.__ = __;
-% my_config2.__ = __;
+my_config1.ommu(2) = -2;
+my_config1.omsa(2) = 0;
+my_config1.ommu(3) = -2;
+my_config1.omsa(3) = 0;
+my_config1.mu_0mu(3) = 0;
+my_config1.mu_0sa(3) = 0;
+
+my_config2.ommu(2) = -2;
+my_config2.omsa(2) = 0;
+my_config2.ommu(3) = -4;
+my_config2.omsa(3) = 0;
+my_config2.mu_0mu(3) = 0;
+my_config2.mu_0sa(3) = 0;
 %=== end: Edit here ===
+
+% Make sure settings in config files are consistent.
+my_config1 = tapas_align_priors(my_config1);
+my_config2 = tapas_align_priors(my_config2);
 config_obs = config_beta_obs();
-config_obs.lognuprmu = 5;
+config_obs.lognuprmu = 30;
 config_obs.lognuprsa = 0;
 
 
 %% Run both models:
-samples1 = tapas_sampleModel(u, my_config1, config_obs);
-samples2 = tapas_sampleModel(u, my_config2, config_obs);
+seed = 123;
+samples1 = tapas_sampleModel(u, my_config1, config_obs, seed);
+samples2 = tapas_sampleModel(u, my_config2, config_obs, seed);
 
 % Plot the responses:
-scatter(1:240, samples1.y);
+figure;
+scatter(1:nt, samples1.y);
 hold on;
-scatter(1:240, samples2.y);
-scatter(1:240, u);
+scatter(1:nt, samples2.y);
+scatter(1:nt, u);
 hold off;
+legend('config 1', 'config 2');
 
-%% Plot the trajectories of the beliefs about volatility
+
+%% Plot the trajectories of the beliefs
+
 %=== begin: Edit here ===
-% plot(samples1.traj.___);
-% hold on;
-% plot(samples2.traj.___);
-% hold off;
+plot(samples1.traj.mu(:,3));
+hold on;
+plot(samples2.traj.mu(:,3));
+hold off;
+legend('config 1', 'config 2');
 %=== end: Edit here ===
 
-% What do you see?
+% What do you see? What effect does the parameter you are varying have?
+
+
 
 %% #########################################################
 %  4.0. Fitting multiple subjects and comparing models
@@ -246,11 +297,15 @@ hold off;
 %
 %% Ex_4.1:
 % Read the code for the `fit_model` function and then run the code.
-results = fit_models(u, dataset, config_files);
+results_all = fit_models(u, dataset, models, config_optim);
+% This can take a little while (couple minutes).
 
+% Save the model fits.
+save('../Data/results_all.mat', 'results_all');
 
 % Extract omega parameters of the HGF models for plotting
-values = extract_parameter(results(:,2:3), 'p_prc.om');
+values = extract_parameter(results_all(:,2), 'p_prc.om');
+
 
 %% Plot boxplot for omega2 and omega3 for config 1
 figure; 
@@ -261,15 +316,40 @@ boxplot(values(:, 2:3, 2), 'labels', {'M3_om2', 'M3_om3'});
 % What do you make of this difference in estimates?
 % How did the prior specification differ?
 
+%% Compare estimates with true parameters
+load('../Data/params.mat');
+k = load('../data/task_k-true.csv');
+
+% Look at omega 2...
+plot_compare_params(results_all, params, k, 2, 'p_prc.om(2)');
+% and omega 3
+plot_compare_params(results_all, params, k, 2, 'p_prc.om(3)');
+
+
+%% For each subject, who is described best by each model?
+nconfigs  = length(models);
+nsubjects = size(dataset,2);
+values    = zeros(nsubjects, length(models));
+
+% Look at the fit indices.
+for i=1:nsubjects
+    for j=1:length(models)
+        values(i,j) = sum(results_all(i, j).fit.optim.res.^2);
+    end
+end
+% Look at true index vs. fit indices per model 
+% (rows: subjects, columns: values)
+disp([k values]);
+
 
 %% Ex_4.2:
 % Use the function 'pp_check' to look at other subjects and models.
 
 i = 1;
 figure;
-for j=1:3
-    subplot(3, 1, j);
-    yrep = pp_check(i, j, 10, u, dataset, config_files, results);
+for j=1:numel(models)
+    subplot(numel(models), 1, j);
+    yrep = pp_check(i, j, 10, u, dataset, results_all);
 end
 
 % Which model fits best?
@@ -289,14 +369,21 @@ end
 % Some designs will work better than others: Think about what should 
 % make the differences come out more pronounced in the analysis.
 
+
 %% Ex_5.1:
 % Read the code of the `run_simulation` function.
 %
 % Try it out:
-% - try random design: u = randi(0:1, 240, 1)
+% - try random design: u = randi(0:1, 250, 1)
 % - try more or less volatile designs
 % - try placing the volatile phase in the first half
-
+%
+% Note: You might want to fix more parameters in the config files used
+% to simulate the data. Otherwise, noise in the parameeters might be too
+% large to distinguish between models. Once you have something working,
+% you can start increasing the variance assess the sensitivity of the 
+% analysis.
+%
 % run_simulation(10, 123);
 
 

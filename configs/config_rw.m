@@ -9,7 +9,7 @@ c.logitv_0mu = tapas_logit(0.5, 1);
 c.logitv_0sa = 0;
 % Alpha
 c.logitalmu = tapas_logit(0.1, 1);
-c.logitalsa = 1;
+c.logitalsa = 0.1;
 
 % Gather prior settings in vectors
 c.priormus = [

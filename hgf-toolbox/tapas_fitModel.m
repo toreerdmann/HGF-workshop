@@ -154,9 +154,9 @@ if nargin > 2 && ~isempty(varargin{1})
         r.c_prc = eval(varargin{1});
     else
         r.c_prc = varargin{1};
-        % Ensure consistency of configuration of priors
-        r.c_prc = tapas_align_priors(r.c_prc);
     end
+    % Ensure consistency of configuration of priors
+    r.c_obs = tapas_align_priors(r.c_obs);
 end
 
 if nargin > 3 && ~isempty(varargin{2})
@@ -164,9 +164,9 @@ if nargin > 3 && ~isempty(varargin{2})
         r.c_obs = eval(varargin{2});
     else
         r.c_obs = varargin{2};
-        % Ensure consistency of configuration of priors
-        r.c_obs = tapas_align_priors(r.c_obs);
     end
+    % Ensure consistency of configuration of priors
+    r.c_obs = tapas_align_priors(r.c_obs);
 end
 
 if nargin > 4 && ~isempty(varargin{3})
@@ -358,11 +358,9 @@ if rval ~= 0
     rethrow(err);
 end
 
-try 
+% try 
     % Do an optimization run
     optres = optimrun(nlj, init, opt_idx, opt_algo, r.c_opt);
-
-    disp(optres.LME);
 
     % Record optimization results
     r.optim.init  = optres.init;
@@ -375,8 +373,8 @@ try
     r.optim.LME   = optres.LME;
     r.optim.accu  = optres.accu;
     r.optim.comp  = optres.comp;
-catch
-end
+% catch
+% end
 
 % Do further optimization runs with random initialization
 if isfield(r.c_opt, 'nRandInit') && r.c_opt.nRandInit > 0

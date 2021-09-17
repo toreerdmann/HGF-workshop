@@ -1,4 +1,4 @@
-function run_simulation(nsubjects, seed)
+function run_simulation(nsubjects, models, seed)
 
 %% Choose inputs
 p = [repmat([.85], 40, 1),
@@ -14,16 +14,16 @@ for ii = 1:length(p)
     u(ii) = rand() < p(ii);
 end
 
-% Setup models
-models = {config_rw, config_hgf_1, config_hgf_2};
-
 
 %% Simulate
-[dataset, k] = simulate_mixture(u, models, nsubjects, seed);
+[dataset, params, k] = simulate_mixture(u, models, nsubjects, seed);
 
                             
 %% Fit 
-results = fit_models(u, dataset, models);
+c_opt = config_optim;
+% Increase number of re-starts to improve chances of finding optimum
+c_opt.nRandInit = 10;
+results = fit_models(u, dataset, models, c_opt);
 
 
 %% For each subject, who is described best by each model?
@@ -33,12 +33,17 @@ values = zeros(nsubjects, length(models));
 % Look at the fit indices.
 for i=1:nsubjects
     for j=1:length(models)
-        values(i,j) = results(i, j).fit.optim.LME;
+        % use LME:
+        % values(i,j) = results(i, j).fit.optim.LME;
+        % use SSE:
+        values(i,j) = sum(results(i, j).fit.optim.res.^2);
+
     end
 end
 disp(values);
 
 %% Plot by true model
+
 fig = figure;
 for i=1:nconfigs
     subplot(nconfigs,1,i);
@@ -56,10 +61,10 @@ disp(fig);
 
 kest = zeros(nsubjects, 1);
 for i=1:nsubjects
-    [m, j] = max(values(i,:));
+    [~, j] = max(values(i,:));
     kest(i) = j;
 end
 % number of correctly classified individuals
 sum(kest == k)
 
-end
+
