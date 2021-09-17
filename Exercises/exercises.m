@@ -62,10 +62,8 @@ legend('y_1', 'y_2', 'u', 'p', 'avg y');
 % b) response   model: tapas_*type of responses*_obs_config
 
 %=== begin: Edit here ===
-config_prc = tapas_ehgf_binary_config;
-config_obs = tapas_beta_obs_config;
-% config_prc = config_hgf_1;
-% config_obs = config_beta_obs;
+% conifg_prc = 'tapas_hgf_*type of inputs*_config'
+% config_obs = 'tapas_*type of responses*_obs_config'
 %=== end: Edit here ===
 
 % fit:
@@ -236,19 +234,8 @@ my_config2 = my_config1;
 % After setting the values
 
 %=== begin: Edit here ===
-my_config1.ommu(2) = -2;
-my_config1.omsa(2) = 0;
-my_config1.ommu(3) = -2;
-my_config1.omsa(3) = 0;
-my_config1.mu_0mu(3) = 0;
-my_config1.mu_0sa(3) = 0;
-
-my_config2.ommu(2) = -2;
-my_config2.omsa(2) = 0;
-my_config2.ommu(3) = -4;
-my_config2.omsa(3) = 0;
-my_config2.mu_0mu(3) = 0;
-my_config2.mu_0sa(3) = 0;
+% my_config1.parameter  =  ....
+% my_config2.parameter  = ....
 %=== end: Edit here ===
 
 % Make sure settings in config files are consistent.
@@ -277,11 +264,11 @@ legend('config 1', 'config 2');
 %% Plot the trajectories of the beliefs
 
 %=== begin: Edit here ===
-plot(samples1.traj.mu(:,3));
-hold on;
-plot(samples2.traj.mu(:,3));
-hold off;
-legend('config 1', 'config 2');
+% plot(samples1.___);
+% hold on;
+% plot(samples2.___);
+% hold off;
+% legend('config 1', 'config 2');
 %=== end: Edit here ===
 
 % What do you see? What effect does the parameter you are varying have?
