@@ -37,8 +37,9 @@ y = 0.95.*(y-0.5)+0.5; % Shrink all y values toward 1/2 by a factor of 0.95
 b0_nu = ptrans(1);
 b1_nu = ptrans(2);
 
+nt = length(y);
 mu = mu1hat;
-nu = 2 + exp(b0_nu + b1_nu .* sa1hat);
+nu = 2 + exp(b0_nu + b1_nu .* linspace(1,nt,nt)');
 
 % Calculate alpha and beta from mu and nu
 al = mu .* nu;

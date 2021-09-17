@@ -22,25 +22,8 @@ end
 b0_nu = p(1);
 b1_nu = p(2);
 
-% nt = size(infStates,1);
-% mu = mu1hat;
-% nu = 2 + exp(b0_nu  + b1_nu .* linspace(1,nt, nt)');
-
 nt = size(infStates,1);
-for t=1:nt
-    if rand() < .8
-        mu = mu1hat(t);
-    else
-        mu = .5;
-    end
-    nu = 2 + exp(b0_nu);
-
-    % Calculate alpha and beta from mu and nu
-    al = mu .* nu;
-    be = (1-mu) .* nu;
-
-    % Simulate
-    y(t) = betarnd(al, be);
-end
+mu = mu1hat;
+nu = 2 + exp(b0_nu  + b1_nu .* linspace(1,nt, nt)');
 
 return;
