@@ -25,5 +25,9 @@ b1_nu = p(2);
 nt = size(infStates,1);
 mu = mu1hat;
 nu = 2 + exp(b0_nu  + b1_nu .* linspace(1,nt, nt)');
+al = mu .* nu;
+be = (1-mu) .* nu;
+
+y = betarnd(al, be);
 
 return;
