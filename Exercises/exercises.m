@@ -166,10 +166,12 @@ hold off;
 % those of the RW model together:
 
 %=== begin: Edit here ===
-% plot(results(1).fit.__);
-% hold on;
-% plot(results(3).fit.__);
+figure;
+% ?plot(results(1).fit.traj.da);
+% old on;
+plot(results(2).fit.traj.da);
 % hold off;
+legend('da_1', 'da_2', 'da_3');
 %=== end: Edit here ===
 
 
@@ -181,7 +183,7 @@ hold off;
 % Read the documentation by calling `help tapas_simModel` and insert
 % the right arguments in the function below.
 
-nreps = 1;
+nreps = 10;
 nm = numel(models);
 yrep = zeros(length(u), nreps, nm);
 for rep=1:nreps
@@ -319,6 +321,7 @@ boxplot(values(:, 2:3, 2), 'labels', {'M3_om2', 'M3_om3'});
 %% Compare estimates with true parameters
 load('../Data/params.mat');
 k = load('../data/task_k-true.csv');
+
 
 % Look at omega 2...
 plot_compare_params(results_all, params, k, 2, 'p_prc.om(2)');
