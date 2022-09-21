@@ -3,7 +3,7 @@
 
 This repo contains the workshop materials.
 
-Here's a helpful cheat sheet for julia beginners: [](https://juliadocs.github.io/Julia-Cheat-Sheet/)
+Here's a helpful cheat sheet for julia beginners: [Julia-Cheat-Sheet](https://juliadocs.github.io/Julia-Cheat-Sheet/)
 
 ## Julia packages
 
