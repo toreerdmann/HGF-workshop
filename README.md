@@ -11,3 +11,8 @@ You can find the new packages we use in this tutorial here:
 
 * [HGF.jl](https://github.com/ilabcode/HGF.jl)
 * [ActionModels.jl](https://github.com/ilabcode/ActionModels.jl)
+
+## TODO
+
+* more convenience functions for the notebook
+* explain more about response models in the presentation/slides
